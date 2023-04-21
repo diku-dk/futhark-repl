@@ -1,0 +1,4 @@
+APScheduler==3.10.1
+Flask==2.2.3
+Flask_HTTPAuth==4.7.0
+PyJWT==2.6.0

@@ -1,0 +1,8 @@
+{
+    "check_time": 5,
+    "last_time_limit": 10,
+    "token_lifespan": 60,
+    "response_size_limit": 8192,
+    "compute_time_limit": 1,
+    "session_amount_limit": null
+}

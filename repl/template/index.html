@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <section class="result">
+    <div id="result" class="commandline" contenteditable="false">{{banner}}</div>
+  </section>
+
+  <section class="input">
+    <div id="lastline" class="lastline" contenteditable="false">{{init_lastline}}</div>
+    <div id="input" class="commandline" contenteditable="true" autofocus></div>
+  </section>
+</body>
+
+<script>
+  const result = document.getElementById('result');
+  const input = document.getElementById('input');
+  const lastline = document.getElementById('lastline');
+  var request_in_progress = false;
+  var code_history = [];
+  var index_history = -1;
+  var code_current = '';
+
+  function update(code_str, result_str, lastline_str) {
+    if (result_str !== '') {
+      result_str += '\n'
+    }
+
+    result.innerText += lastline.innerText + code_str + '\n' + result_str;
+    lastline.innerText = lastline_str;
+    window.scrollTo(0, document.body.scrollHeight);
+    input.innerText = '';
+  }
+  function containsWhitespace(str) {
+    return /\s/.test(str);
+  }
+
+  window.addEventListener('keydown', function (event) {
+    if (13 === event.keyCode) {
+      event.preventDefault();
+      if (request_in_progress) {
+        return false;
+      }
+      request_in_progress = true;
+      var code_str = input.innerText.trim();
+      code_history.push(code_str);
+      input.contentEditable = false;
+      const json = {
+        "code": code_str,
+      };
+
+      fetch("{{url_for('repl')}}", {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer {{token}}'
+        },
+        body: JSON.stringify(json)
+      })
+        .then(function (response) {
+          try {
+            return response.json();
+          } catch (SyntaxError) {
+            return null;
+          }
+        })
+        .then(function (response) {
+          if (response.hasOwnProperty("message")) {
+            var message_str = 'ERROR: ' + response["message"]
+            update(code_str, message_str, '');
+            return;
+          }
+          console.log(response)
+          var result_str = response["result"];
+          var lastline_str = response["lastline"];
+          update(code_str, result_str, lastline_str);
+          input.contentEditable = true;
+          request_in_progress = false;
+        });
+      return false;
+    }
+  });
+
+  document.getElementById('lastline').addEventListener("click", function () {
+    document.getElementById('input').focus()
+  });
+
+  document.getElementById('result').addEventListener("click", function () {
+    document.getElementById('input').focus()
+  });
+</script>
+</html>

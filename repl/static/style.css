@@ -1,0 +1,44 @@
+section.input,
+section.result,
+section.error {
+    display: flex;
+    flex-flow: row nowrap;
+    width: 1200px;
+    height: auto;
+    margin: 0 auto;
+    background-color: #5f021f;
+    font-family: monospace;
+    border-left: 3px solid #5f021f;
+    border-right: 3px solid #5f021f;
+    white-space: break-spaces;
+}
+
+section.result {
+    border-top: 3px solid #5f021f;
+}
+
+section.input {
+    border-bottom: 3px solid #5f021f;
+}
+
+.commandline,
+.lastline,
+.text {
+    font-size: xx-large;
+    color: #fff9e5;
+    outline: none;
+    word-wrap: break-word;
+}
+
+.commandline {
+    flex: 1;
+}
+
+.lastline {
+    float: left;
+}
+
+.body {
+    background-color: #fff9e5;
+}
+
