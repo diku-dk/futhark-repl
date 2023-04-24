@@ -1,10 +1,12 @@
 # Online Futhark REPL
 This is a website that can start Futhark REPL processes and let users interact with the REPLs through a website.
 
-To run the website using a docker container with waitress.
+To run the website with a specific port using a docker container with waitress.
 ```
-./run.sh
+./run.sh PORT
 ```
+An example of this could be `./run.sh 8080`, if the port is not specified then the port will be `8080`.
+When `./run.sh PORT` is done executing then waitress will be serving the website on http://0.0.0.0:PORT.
 
 ## Settings
 Inside [repl/settings.json](repl/settings.json) are some paramaters which have the following meanings:
