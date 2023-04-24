@@ -23,11 +23,19 @@ section.input {
 
 .commandline,
 .lastline,
-.text {
-    font-size: xx-large;
+.error {
     color: #fff9e5;
     outline: none;
     word-wrap: break-word;
+}
+
+.commandline,
+.lastline {
+    font-size: xx-large;
+}
+
+.error {
+    font-size: 56px;
 }
 
 .commandline {

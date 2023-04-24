@@ -8,21 +8,37 @@ import subprocess
 import time
 import os
 import pty
-from typing import Union
+from typing import Union, Optional, List
 import datetime
 
 
 class REPLErrors(Enum):
+    """Errors the REPL session might return."""
+
     TIMEOUT = auto()
     SIZELIMIT = auto()
 
 
-def timed_read(fds, size_limit, timeout):
+def timed_read(
+    fds: List[int], size_limit: Optional[int], timeout: float
+) -> Union[str, REPLErrors]:
+    """
+    Reads from the file descriptors (fds) that are ready within the given time
+    limit and size constraints. It will wait for a file pointer to be ready to
+    be read from and then continue reading until the there is no more or the
+    timelimit or size limit is exceeded.
+
+    A problem with this approach is select is timed out at 0.2 so if the steps
+    in the computation takes too much time then the output will be broken. I
+    think this is unlikely to happen for users.
+
+    size_limit is measured in bytes and timeout is measured in seconds.
+    """
     start_time = time.time()
     result = b""
     is_initial_read = True
     while (time.time() - start_time) < timeout:
-        ready_to_read, _, _ = select.select(fds, [], [], 0.1)
+        ready_to_read, _, _ = select.select(fds, [], [], 0.2)
         if len(ready_to_read) == 0 and is_initial_read:
             continue
         try:
@@ -34,11 +50,11 @@ def timed_read(fds, size_limit, timeout):
             sub_result = os.read(ready_to_read.pop(), 1024)
             result += sub_result
 
-            if len(result) >= size_limit:
+            if size_limit is not None and len(result) >= size_limit:
                 return REPLErrors.SIZELIMIT
             elif len(sub_result) == 0:
                 break
-            
+
         except OSError as e:
             if e.errno == errno.EAGAIN:
                 continue
@@ -51,8 +67,12 @@ def timed_read(fds, size_limit, timeout):
 
 
 class FutharkREPL:
+    """
+    Class that handles a Futhark REPL process that can be interacted with.
+    """
+
     def __init__(
-        self, response_size_limit: int, compute_time_limit: datetime.timedelta
+        self, response_size_limit: Optional[int], compute_time_limit: datetime.timedelta
     ):
         self.ansi_escape = re.compile(
             r"""
@@ -61,6 +81,7 @@ class FutharkREPL:
             re.VERBOSE,
         )
 
+        # Used to simulate a shell.
         self.stdin_master, self.stdin_slave = pty.openpty()
         self.stdout_master, self.stdout_slave = pty.openpty()
         self.stderr_master, self.stderr_slave = pty.openpty()
@@ -84,6 +105,10 @@ class FutharkREPL:
         self.pause()
 
     def read(self) -> Union[str, REPLErrors]:
+        """
+        Reads from the process' stdout or stderr of if an error happens then
+        the session is killed.
+        """
         out = timed_read(self.fds, self.response_size_limit, self.compute_time_limit)
 
         if isinstance(out, Enum):
@@ -93,13 +118,19 @@ class FutharkREPL:
         return self.ansi_escape.sub("", out.decode())
 
     def create_generator(self):
+        """
+        A generator that can be used to communicate with the REPL process.
+        """
         yield self.read()
         while True:
             inp = yield
             self.stdin.write(f"{inp}\n")
             yield self.read()
 
-    def run(self, code) -> Union[tuple[str, str], REPLErrors]:
+    def run(self, code: str) -> Union[tuple[str, str], REPLErrors]:
+        """
+        Method for communicating with the active REPL process.
+        """
         next(self.generator)
         out = self.generator.send(code)
 
@@ -115,15 +146,18 @@ class FutharkREPL:
         return result.strip(), lastline.strip()
 
     def kill(self):
+        """Kills the REPL process."""
         self.process.kill()
 
     def pause(self):
+        """Pauses the process."""
         try:
             os.kill(self.process.pid, signal.SIGSTOP)
         except ProcessLookupError:
             pass
 
     def resume(self):
+        """Resumes the process."""
         try:
             os.kill(self.process.pid, signal.SIGCONT)
         except ProcessLookupError:
@@ -134,7 +168,7 @@ class Session:
     def __init__(
         self,
         identifier: str,
-        response_size_limit: int,
+        response_size_limit: Optional[int],
         compute_time_limit: datetime.timedelta,
     ):
         self.active = False

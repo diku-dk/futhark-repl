@@ -8,6 +8,7 @@ pkgs.mkShell {
     python3Packages.black
     python3Packages.flask
     python3Packages.APScheduler
+    python3Packages.waitress
     futhark
   ];
 }
