@@ -1,0 +1,24 @@
+
+name: CI
+
+on:
+  pull_request:
+
+  push:
+    branches: [ master ]
+
+jobs:
+  test-style:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Nix
+      uses: cachix/install-nix-action@v20
+
+    - name: Style check
+      run: nix-shell --pure --run "black --check repl"
+
+    - name: Type check
+      run: nix-shell --pure --run "mypy repl"

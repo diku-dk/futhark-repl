@@ -23,3 +23,6 @@ Inside [repl/settings.json](repl/settings.json) are some paramaters which have t
 * `response_size_limit`: The maximum reponse size, the website can give to a user (in bytes). If this is null then there is no limit.
 * `compute_time_limit`: The maximum amount of time a computation may take (in seconds).
 * `session_amount_limit`: The maximum amount of active sessions, null the amount is unlimited.
+
+## Development
+For formatting just use the default settings for `black` and use `mypy` for type checking. 
