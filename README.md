@@ -1,14 +1,6 @@
 # Online Futhark REPL
 This is a website that can start Futhark REPL processes and let users interact with the REPLs through a website.
 
-To start the website in debugging mode do.
-```
-cd repl && flask --app app run --debug
-```
-You may also just use `flask run`:
-```
-cd repl && flask run
-```
 To run the website using a docker container with waitress.
 ```
 ./run.sh
@@ -25,4 +17,13 @@ Inside [repl/settings.json](repl/settings.json) are some paramaters which have t
 * `session_amount_limit`: The maximum amount of active sessions, null the amount is unlimited.
 
 ## Development
-For formatting just use the default settings for `black` and use `mypy` for type checking. 
+For formatting just use the default settings for `black` and use `mypy` for type checking.
+
+To start the website in debugging mode do.
+```
+cd repl && flask --app app run --debug
+```
+You may also just use `flask run`:
+```
+cd repl && flask run
+```
