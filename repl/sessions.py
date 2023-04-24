@@ -8,7 +8,7 @@ import hmac
 import time
 import atexit
 import datetime
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BackgroundScheduler  # type: ignore
 
 
 class Sessions:
@@ -24,7 +24,7 @@ class Sessions:
         compute_time_limit: datetime.timedelta,
         session_amount_limit: Optional[int],
     ) -> None:
-        self.secret_key = secret_key
+        self.secret_key = secret_key.decode()
         self.algorithm = "HS256"
         self.sessions: Dict[str, Session] = dict()
         self.last_used: Dict[str, float] = dict()
@@ -53,7 +53,7 @@ class Sessions:
             elif self.decode_token(token) is None:
                 self.remove(token)
 
-    def encode_id(self, identifier: UUID) -> str:
+    def encode_id(self, identifier: str) -> str:
         """
         Given an id create a JSON Web Token and saves the time it was encoded.
         """

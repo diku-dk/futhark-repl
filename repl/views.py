@@ -1,6 +1,6 @@
 import os
-from flask import Flask, render_template, request, Response, jsonify
-from flask_httpauth import HTTPTokenAuth
+from flask import Flask, render_template, request, Response, jsonify  # type: ignore
+from flask_httpauth import HTTPTokenAuth  # type: ignore
 from sessions import Sessions
 from session import REPLErrors
 import datetime

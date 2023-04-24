@@ -21,7 +21,7 @@ class REPLErrors(Enum):
 
 def timed_read(
     fds: List[int], size_limit: Optional[int], timeout: float
-) -> Union[str, REPLErrors]:
+) -> Union[bytes, REPLErrors]:
     """
     Reads from the file descriptors (fds) that are ready within the given time
     limit and size constraints. It will wait for a file pointer to be ready to
@@ -127,7 +127,7 @@ class FutharkREPL:
             self.stdin.write(f"{inp}\n")
             yield self.read()
 
-    def run(self, code: str) -> Union[tuple[str, str], REPLErrors]:
+    def run(self, code: str) -> Union[tuple[str, str], Enum]:
         """
         Method for communicating with the active REPL process.
         """
@@ -180,7 +180,7 @@ class Session:
         self.banner = self.process.banner
         self.init_lastline = self.process.init_lastline
 
-    def read_eval_print(self, code: str) -> Union[tuple[str, str], REPLErrors]:
+    def read_eval_print(self, code: str) -> Union[tuple[str, str], Enum]:
         self.active = True
         self.process.resume()
         out = self.process.run(code)
