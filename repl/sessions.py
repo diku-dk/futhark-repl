@@ -24,7 +24,7 @@ class Sessions:
         compute_time_limit: datetime.timedelta,
         session_amount_limit: Optional[int],
     ) -> None:
-        self.secret_key = secret_key.decode()
+        self.secret_key = secret_key.hex()
         self.algorithm = "HS256"
         self.sessions: Dict[str, Session] = dict()
         self.last_used: Dict[str, float] = dict()

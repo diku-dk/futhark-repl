@@ -1,6 +1,6 @@
 FROM debian:11
 
-WORKDIR /app
+WORKDIR /
 
 RUN apt update && apt install -y libtinfo-dev libgmp-dev zlib1g-dev python pip wget
 COPY . .
