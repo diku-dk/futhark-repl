@@ -41,7 +41,7 @@ def timed_read(
     start_time = time.time()
     result = b""
     is_initial_read = True
-    
+
     while (time.time() - start_time) < timeout:
         ready_to_read, _, _ = select.select(fds, [], [], step_timeout)
         if len(ready_to_read) == 0 and is_initial_read:
