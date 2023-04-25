@@ -10,7 +10,6 @@ section.error {
     font-family: monospace;
     border-left: 3px solid #5f021f;
     border-right: 3px solid #5f021f;
-    white-space: break-spaces;
 }
 
 section.result {
@@ -24,9 +23,12 @@ section.input {
 .commandline,
 .lastline,
 .error {
+    overflow: hidden;
     color: #fff9e5;
     outline: none;
     word-wrap: break-word;
+    white-space: break-spaces;
+    overflow-wrap: break-word;
 }
 
 .commandline,

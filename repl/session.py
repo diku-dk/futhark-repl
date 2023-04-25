@@ -38,7 +38,8 @@ def timed_read(
     result = b""
     is_initial_read = True
     while (time.time() - start_time) < timeout:
-        ready_to_read, _, _ = select.select(fds, [], [], 0.2)
+        select_timeout = 0.05
+        ready_to_read, _, _ = select.select(fds, [], [], select_timeout)
         if len(ready_to_read) == 0 and is_initial_read:
             continue
         try:
@@ -47,7 +48,7 @@ def timed_read(
             if len(ready_to_read) == 0:
                 return result
 
-            sub_result = os.read(ready_to_read.pop(), 1024)
+            sub_result = os.read(ready_to_read.pop(), 2**13)
             result += sub_result
 
             if size_limit is not None and len(result) >= size_limit:
@@ -165,6 +166,7 @@ class FutharkREPL:
 
 
 class Session:
+    """A session managed by a Sessions"""
     def __init__(
         self,
         identifier: str,
@@ -181,6 +183,7 @@ class Session:
         self.init_lastline = self.process.init_lastline
 
     def read_eval_print(self, code: str) -> Union[tuple[str, str], Enum]:
+        """Reads ssome code and evaluates it in the repl"""
         self.active = True
         self.process.resume()
         out = self.process.run(code)
@@ -194,7 +197,9 @@ class Session:
         return result.strip(), lastline.strip() + " "
 
     def kill(self):
+        """Ends the session."""
         self.process.kill()
 
     def is_active(self) -> bool:
+        """This is used in sessions to check if computations can be done."""
         return self.active
