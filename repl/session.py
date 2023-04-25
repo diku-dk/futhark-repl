@@ -167,6 +167,7 @@ class FutharkREPL:
 
 class Session:
     """A session managed by a Sessions"""
+
     def __init__(
         self,
         identifier: str,
