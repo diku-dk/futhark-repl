@@ -4,5 +4,7 @@
     "token_lifespan": 60,
     "response_size_limit": null,
     "compute_time_limit": 1,
-    "session_amount_limit": null
+    "session_amount_limit": null,
+    "step_timeout": 200,
+    "step_read_size": 8192
 }

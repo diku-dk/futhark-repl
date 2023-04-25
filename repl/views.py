@@ -26,6 +26,8 @@ sessions = Sessions(
     response_size_limit=settings["response_size_limit"],
     compute_time_limit=datetime.timedelta(seconds=settings["compute_time_limit"]),
     session_amount_limit=settings["session_amount_limit"],
+    step_timeout=datetime.timedelta(milliseconds=settings["step_timeout"]),
+    step_read_size=settings["step_read_size"],
 )
 
 
@@ -90,7 +92,6 @@ def index():
     available then an error page is returned.
     """
     result = sessions.create_session()
-
     if result is None:
         return Response(render_template("limit_error.html"))
 

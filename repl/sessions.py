@@ -23,6 +23,8 @@ class Sessions:
         response_size_limit: Optional[int],
         compute_time_limit: datetime.timedelta,
         session_amount_limit: Optional[int],
+        step_timeout: datetime.timedelta,
+        step_read_size: int,
     ) -> None:
         self.secret_key = secret_key.hex()
         self.algorithm = "HS256"
@@ -33,6 +35,8 @@ class Sessions:
         self.response_size_limit = response_size_limit
         self.compute_time_limit = compute_time_limit
         self.session_amount_limit = session_amount_limit
+        self.step_timeout = step_timeout
+        self.step_read_size = step_read_size
 
         self.scheduler = BackgroundScheduler()
         self.scheduler.add_job(
@@ -101,6 +105,8 @@ class Sessions:
             identifier=identifier,
             compute_time_limit=self.compute_time_limit,
             response_size_limit=self.response_size_limit,
+            step_timeout=self.step_timeout,
+            step_read_size=self.step_read_size,
         )
         self.sessions[token] = session
         return token, session

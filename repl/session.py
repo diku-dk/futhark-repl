@@ -20,7 +20,11 @@ class REPLErrors(Enum):
 
 
 def timed_read(
-    fds: List[int], size_limit: Optional[int], timeout: float
+    fds: List[int],
+    size_limit: Optional[int],
+    timeout: float,
+    step_timeout: float,
+    step_read_size: int,
 ) -> Union[bytes, REPLErrors]:
     """
     Reads from the file descriptors (fds) that are ready within the given time
@@ -37,9 +41,9 @@ def timed_read(
     start_time = time.time()
     result = b""
     is_initial_read = True
+    
     while (time.time() - start_time) < timeout:
-        select_timeout = 0.05
-        ready_to_read, _, _ = select.select(fds, [], [], select_timeout)
+        ready_to_read, _, _ = select.select(fds, [], [], step_timeout)
         if len(ready_to_read) == 0 and is_initial_read:
             continue
         try:
@@ -48,7 +52,7 @@ def timed_read(
             if len(ready_to_read) == 0:
                 return result
 
-            sub_result = os.read(ready_to_read.pop(), 2**13)
+            sub_result = os.read(ready_to_read.pop(), step_read_size)
             result += sub_result
 
             if size_limit is not None and len(result) >= size_limit:
@@ -73,7 +77,11 @@ class FutharkREPL:
     """
 
     def __init__(
-        self, response_size_limit: Optional[int], compute_time_limit: datetime.timedelta
+        self,
+        response_size_limit: Optional[int],
+        compute_time_limit: datetime.timedelta,
+        step_timeout: datetime.timedelta,
+        step_read_size: int,
     ):
         self.ansi_escape = re.compile(
             r"""
@@ -88,6 +96,8 @@ class FutharkREPL:
         self.stderr_master, self.stderr_slave = pty.openpty()
         self.response_size_limit = response_size_limit
         self.compute_time_limit = compute_time_limit.seconds
+        self.step_timeout = step_timeout.total_seconds()
+        self.step_read_size = step_read_size
 
         self.stdin = open(self.stdin_master, "w")
         self.fds = [self.stdout_master, self.stderr_master]
@@ -110,7 +120,13 @@ class FutharkREPL:
         Reads from the process' stdout or stderr of if an error happens then
         the session is killed.
         """
-        out = timed_read(self.fds, self.response_size_limit, self.compute_time_limit)
+        out = timed_read(
+            self.fds,
+            self.response_size_limit,
+            self.compute_time_limit,
+            self.step_timeout,
+            self.step_read_size,
+        )
 
         if isinstance(out, Enum):
             self.kill()
@@ -173,12 +189,16 @@ class Session:
         identifier: str,
         response_size_limit: Optional[int],
         compute_time_limit: datetime.timedelta,
+        step_timeout: datetime.timedelta,
+        step_read_size: int,
     ):
         self.active = False
         self.identifier = identifier
         self.process = FutharkREPL(
             response_size_limit=response_size_limit,
             compute_time_limit=compute_time_limit,
+            step_timeout=step_timeout,
+            step_read_size=step_read_size,
         )
         self.banner = self.process.banner
         self.init_lastline = self.process.init_lastline
