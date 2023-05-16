@@ -1,23 +1,24 @@
 section.input,
 section.result,
 section.error {
+    background-color: #5f021f;
     display: flex;
     flex-flow: row nowrap;
     width: 1200px;
     height: auto;
     margin: 0 auto;
-    background-color: #5f021f;
+    padding: 0;
     font-family: monospace;
-    border-left: 3px solid #5f021f;
-    border-right: 3px solid #5f021f;
 }
 
 section.result {
-    border-top: 3px solid #5f021f;
+    padding: 1em;
+    padding-bottom: 0;
 }
 
 section.input {
-    border-bottom: 3px solid #5f021f;
+    padding: 1em;
+    padding-top: 0;
 }
 
 .commandline,
@@ -48,7 +49,29 @@ section.input {
     float: left;
 }
 
-.body {
+body {
+    font-family: sans-serif;
     background-color: #fff9e5;
 }
 
+nav {
+    background-color: #5f021f;
+    color: #fff9e5;
+    padding: 0.5em;
+    margin: 0;
+    margin-bottom: 2em;
+    font-size: 22px;
+}
+
+nav > ul {
+    display: inline;
+}
+
+nav > ul > li {
+    display: inline;
+    margin-left: 3em;
+}
+
+nav a, nav a:visited {
+    color: #fff9e5;
+}
