@@ -58,9 +58,11 @@ def repl():
     line and the result from before.
     """
     code = request.get_json()["code"]
-    # Taking the token should be safe since the token was verified by auth.
-    token = request.headers.get("Authorization")[7:]
     
+    authorization = request.headers.get("Authorization")
+    if authorization is None:
+        return auth_error(401)
+    token = authorization[7:]
     if not verify_token(token):
         return auth_error(401)
     
