@@ -49,7 +49,6 @@ def verify_token(token):
 
 
 @app.route("/repl", methods=["POST"])
-@auth.login_required
 def repl():
     """
     API that interacts with a REPL session using the given token and some input
@@ -61,6 +60,10 @@ def repl():
     code = request.get_json()["code"]
     # Taking the token should be safe since the token was verified by auth.
     token = request.headers.get("Authorization")[7:]
+    
+    if not verify_token(token):
+        return auth_error(401)
+    
     session = sessions.get(token)
 
     if session.is_active():
