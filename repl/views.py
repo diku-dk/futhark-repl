@@ -58,14 +58,14 @@ def repl():
     line and the result from before.
     """
     code = request.get_json()["code"]
-    
+
     authorization = request.headers.get("Authorization")
     if authorization is None:
         return auth_error(401)
     token = authorization[7:]
     if not verify_token(token):
         return auth_error(401)
-    
+
     session = sessions.get(token)
 
     if session.is_active():
