@@ -1,3 +1,7 @@
+#!/bin/sh
+
+set -e
+
 DEFAULTPORT=8080
 PORT=$1
 VERSION=0.27.1
